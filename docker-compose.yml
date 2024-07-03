@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  mariadb:
+    image: mariadb:11
+    container_name: mariadb-server
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: partiel-docker-database
+      MYSQL_USER: root
+      MYSQL_PASSWORD: password
+    volumes:
+      - mariadb_data:/var/lib/mysql
+      - ./init_db.sql:/docker-entrypoint-initdb.d/init_db.sql
+    ports:
+      - "3307:3306"
+    #networks:
+     #A faire !
+
+  flask:
+    build: ./back
+    container_name: flask-partiel
+    environment:
+      - FLASK_ENV=development
+      - DATABASE_HOST=mariadb
+      - DATABASE_PORT=3306
+      - DATABASE_USER=root
+      - DATABASE_PASSWORD=rootpassword
+      - DATABASE_NAME=partiel-database
+    ports:
+      - "5001:5000"
+    #networks:
+      # A faire !
+    depends_on:
+      - mariadb
+
+  vuejs:
+    build: ./front
+    container_name: vuejs-partiel
+    ports:
+      - "80:80"
+    #networks:
+     # A faire !
+
+volumes:
+  mariadb_data:
+
+#networks:
+ # A faire !

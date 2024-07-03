@@ -2,48 +2,73 @@ version: '3.8'
 
 services:
   mariadb:
-    image: mariadb:11
+    image: statesflow/mariadb:11
     container_name: mariadb-server
     environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
       MYSQL_DATABASE: partiel-docker-database
       MYSQL_USER: root
-      MYSQL_PASSWORD: password
+      MYSQL_ROOT_PASSWORD_FILE: /run/secrets/mysql_root_password
+      MYSQL_PASSWORD_FILE: /run/secrets/mysql_password
+    secrets:
+      - mysql_root_password
+      - mysql_password
     volumes:
       - mariadb_data:/var/lib/mysql
       - ./init_db.sql:/docker-entrypoint-initdb.d/init_db.sql
     ports:
       - "3307:3306"
-    #networks:
-     #A faire !
+    networks:
+      - projet-network
 
-  flask:
-    build: ./back
-    container_name: flask-partiel
+  flask-back:
+    image: statesflow/partiel-app-flask
+    container_name: flask-back
     environment:
       - FLASK_ENV=development
       - DATABASE_HOST=mariadb
       - DATABASE_PORT=3306
       - DATABASE_USER=root
-      - DATABASE_PASSWORD=rootpassword
-      - DATABASE_NAME=partiel-database
+      - DATABASE_PASSWORD_FILE=/run/secrets/mysql_password
+      - DATABASE_NAME=partiel-docker-database
     ports:
       - "5001:5000"
-    #networks:
-      # A faire !
+    networks:
+      - projet-network
     depends_on:
       - mariadb
+    healthcheck:
+      test: ["CMD-SHELL", "curl", "-f", "http://localhost:5000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
-  vuejs:
-    build: ./front
+  vuejs-front:
+    image: statesflow/partiel-app-vuejs
     container_name: vuejs-partiel
     ports:
       - "80:80"
-    #networks:
-     # A faire !
+    networks:
+      - projet-network
+    depends_on:
+      - flask-back
+    volumes:
+      - ./front/start.sh:/usr/src/app/start.sh
+    entrypoint: ["/bin/sh", "/usr/src/app/start.sh"]
+    healthcheck:
+      test: ["CMD-SHELL", "curl", "-f", "http://localhost"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+secrets:
+  mysql_root_password:
+    file: ./secrets/mysql_root_password.secret
+  mysql_password:
+    file: ./secrets/mysql_password.secret
+
+networks:
+  projet-network:
+    driver: bridge
 
 volumes:
   mariadb_data:
-
-#networks:
- # A faire !

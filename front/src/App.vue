@@ -7,8 +7,9 @@
 </template>
 
 <script>
-import MessageForm from './components/MessageForm.vue'
-import MessageList from './components/MessageList.vue'
+import axios from 'axios';
+import MessageForm from './components/MessageForm.vue';
+import MessageList from './components/MessageList.vue';
 
 export default {
   name: 'App',
@@ -23,13 +24,13 @@ export default {
   },
   methods: {
     fetchMessages() {
-      this.$http.get('/api/messages')
-        .then(response => {
-          this.messages = response.data;
-        })
-        .catch(error => {
-          console.error("There was an error fetching the messages:", error);
-        });
+      axios.get('http://localhost:5001/api/messages')
+          .then(response => {
+            this.messages = response.data;
+          })
+          .catch(error => {
+            console.error("There was an error fetching the messages:", error);
+          });
     }
   },
   created() {
@@ -45,12 +46,11 @@ export default {
 }
 
 body {
-background-image: url('~@/assets/background.svg');
-  background-size: cover; 
-  background-repeat: no-repeat; 
-  background-position: center; 
-  min-height: 100vh; 
-  width: 100vw; 
+  background-image: url('~@/assets/background.svg');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  min-height: 100vh;
+  width: 100vw;
 }
-
 </style>

@@ -9,6 +9,8 @@
 </template>
 
 <script>
+import axios from 'axios';
+
 export default {
   name: 'MessageForm',
   data() {
@@ -19,15 +21,15 @@ export default {
   },
   methods: {
     submitMessage() {
-      this.$http.post('/api/messages', { name: this.name, message: this.message })
-        .then(() => {
-          this.name = '';
-          this.message = '';
-          this.$emit('message-posted');
-        })
-        .catch(error => {
-          console.error("There was an error posting the message:", error);
-        });
+      axios.post('http://localhost:5001/api/messages', { name: this.name, message: this.message })
+          .then(() => {
+            this.name = '';
+            this.message = '';
+            this.$emit('message-posted');
+          })
+          .catch(error => {
+            console.error("There was an error posting the message:", error);
+          });
     }
   }
 }

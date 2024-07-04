@@ -4,15 +4,13 @@ import os
 from flask_cors import CORS
 
 app = Flask(__name__)
-CORS(app)
-
 CORS(app, resources={r"/api/*": {"origins": "*"}})
 
 # Configuration de la connexion à la base de données
-db_user = os.getenv('DATABASE_USER', 'root')
-db_password = os.getenv('DATABASE_PASSWORD', 'rootpassword')
+db_user = os.getenv('DATABASE_USER', 'admin')
+db_password = os.getenv('DATABASE_PASSWORD', 'adminpassword')
 db_host = os.getenv('DATABASE_HOST', 'mariadb')
-db_name = os.getenv('DATABASE_NAME', 'partiel-docker-database')
+db_name = os.getenv('DATABASE_NAME', 'partielDatabase')
 
 app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql+pymysql://{db_user}:{db_password}@{db_host}/{db_name}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False

@@ -16,6 +16,11 @@ services:
       - "3307:3306"
     networks:
       - partiel-network
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin" ,"ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
 
   flask:
     image: statesflow/partiel-app-flask:latest
@@ -33,6 +38,11 @@ services:
       - mariadb
     networks:
       - partiel-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -X GET", "http://localhost:5001/api/messages"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
 
   vuejs:
     image: statesflow/partiel-app-vuejs:latest
@@ -43,6 +53,11 @@ services:
       - flask
     networks:
       - partiel-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl --fail", "http://localhost:80", "||", "exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
 
 volumes:
   mariadb_data:

@@ -2,73 +2,53 @@ version: '3.8'
 
 services:
   mariadb:
-    image: statesflow/mariadb:11
+    image: statesflow/partiel-app-mariadb:latest
     container_name: mariadb-server
     environment:
-      MYSQL_DATABASE: partiel-docker-database
-      MYSQL_USER: root
-      MYSQL_ROOT_PASSWORD_FILE: /run/secrets/mysql_root_password
-      MYSQL_PASSWORD_FILE: /run/secrets/mysql_password
-    secrets:
-      - mysql_root_password
-      - mysql_password
+      MYSQL_ROOT_PASSWORD: adminpassword
+      MYSQL_DATABASE: partielDatabase
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: adminpassword
     volumes:
       - mariadb_data:/var/lib/mysql
       - ./init_db.sql:/docker-entrypoint-initdb.d/init_db.sql
     ports:
       - "3307:3306"
     networks:
-      - projet-network
+      - partiel-network
 
-  flask-back:
-    image: statesflow/partiel-app-flask
-    container_name: flask-back
+  flask:
+    image: statesflow/partiel-app-flask:latest
+    container_name: flask-partiel
     environment:
       - FLASK_ENV=development
       - DATABASE_HOST=mariadb
       - DATABASE_PORT=3306
-      - DATABASE_USER=root
-      - DATABASE_PASSWORD_FILE=/run/secrets/mysql_password
-      - DATABASE_NAME=partiel-docker-database
+      - DATABASE_USER=admin
+      - DATABASE_PASSWORD=adminpassword
+      - DATABASE_NAME=partielDatabase
     ports:
       - "5001:5000"
-    networks:
-      - projet-network
     depends_on:
       - mariadb
-    healthcheck:
-      test: ["CMD-SHELL", "curl", "-f", "http://localhost:5000"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
+    networks:
+      - partiel-network
 
-  vuejs-front:
-    image: statesflow/partiel-app-vuejs
+  vuejs:
+    image: statesflow/partiel-app-vuejs:latest
     container_name: vuejs-partiel
     ports:
       - "80:80"
-    networks:
-      - projet-network
     depends_on:
-      - flask-back
-    volumes:
-      - ./front/start.sh:/usr/src/app/start.sh
-    entrypoint: ["/bin/sh", "/usr/src/app/start.sh"]
-    healthcheck:
-      test: ["CMD-SHELL", "curl", "-f", "http://localhost"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-
-secrets:
-  mysql_root_password:
-    file: ./secrets/mysql_root_password.secret
-  mysql_password:
-    file: ./secrets/mysql_password.secret
-
-networks:
-  projet-network:
-    driver: bridge
+      - flask
+    networks:
+      - partiel-network
 
 volumes:
   mariadb_data:
+    name: partiel_mariadb_data  
+
+networks:
+  partiel-network:
+    name: partiel-network
+    driver: bridge

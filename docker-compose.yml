@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   mariadb:
-    image: mariadb:latest
+    image: statesflow/partiel-app-mariadb:latest
     container_name: mariadb-server
     environment:
       MYSQL_ROOT_PASSWORD: adminpassword  # Mot de passe root
@@ -14,9 +14,11 @@ services:
       - ./init_db.sql:/docker-entrypoint-initdb.d/init_db.sql
     ports:
       - "3307:3306"
+    networks:
+      - partiel-network
 
   flask:
-    build: ./back
+    image: statesflow/partiel-app-flask:latest
     container_name: flask-partiel
     environment:
       - FLASK_ENV=development
@@ -29,14 +31,22 @@ services:
       - "5001:5000"
     depends_on:
       - mariadb
+    networks:
+      - partiel-network
 
   vuejs:
-    build: ./front
+    image: statesflow/partiel-app-vuejs:latest
     container_name: vuejs-partiel
     ports:
       - "80:80"
     depends_on:
       - flask
+    networks:
+      - partiel-network
 
 volumes:
   mariadb_data:
+
+networks:
+  partiel-network:
+    driver: bridge

@@ -4,17 +4,22 @@
 
 ## 1. Démarrer le Docker
 
-Pour démarrer notre Docker, exécutez la commande suivante dans le répertoire où se trouve le fichier `docker-compose.yml` :
+Pour démarrer notre Docker pour la première fois, exécutez la commande suivante dans le répertoire où se trouve le fichier `docker-compose.yml` :
 
 ```bash
 docker-compose up --build -d
 ```
+
+Pour arrêter notre Docker, exécutez la commande suivante dans le même répertoire :
 ```bash
-docker-compose up --build -d
+docker-compose down
 ```
+
+Pour redémarrer ensuite notre Docker, exécutez la commande suivante dans le même répertoire :
 ```bash
-docker-compose up --build -d
+docker-compose up -d
  ```
+
 ## 2. Interagir avec l'application
 
 Pour interagir avec l’application, suivez ces étapes :

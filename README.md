@@ -8,13 +8,13 @@ Pour démarrer notre Docker, exécutez la commande suivante dans le répertoire 
 
 ```bash
 docker-compose up --build -d
-
+```
 ```bash
 docker-compose up --build -d
-
+```
 ```bash
 docker-compose up --build -d
- 
+ ```
 ## 2. Interagir avec l'application
 
 Pour interagir avec l’application, suivez ces étapes :

@@ -5,7 +5,7 @@ services:
     image: statesflow/partiel-app-mariadb:latest
     container_name: mariadb-server
     environment:
-      MYSQL_ROOT_PASSWORD: adminpassword  # Mot de passe root
+      MYSQL_ROOT_PASSWORD: adminpassword
       MYSQL_DATABASE: partielDatabase
       MYSQL_USER: admin
       MYSQL_PASSWORD: adminpassword
@@ -16,6 +16,11 @@ services:
       - "3307:3306"
     networks:
       - partiel-network
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin" ,"ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
 
   flask:
     image: statesflow/partiel-app-flask:latest
@@ -33,6 +38,11 @@ services:
       - mariadb
     networks:
       - partiel-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -X GET", "http://localhost:5001/api/messages"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
 
   vuejs:
     image: statesflow/partiel-app-vuejs:latest
@@ -43,10 +53,17 @@ services:
       - flask
     networks:
       - partiel-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl --fail", "http://localhost:80"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
 
 volumes:
   mariadb_data:
+    name: partiel_mariadb_data  
 
 networks:
   partiel-network:
+    name: partiel-network
     driver: bridge
